@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.retroffit_api_call_app.R
 import com.example.retroffit_api_call_app.models.Animal
 
-class AnimalListAdapter(var list: ArrayList<Animal>): RecyclerView.Adapter<AnimalListAdapter.ViewHolder>() {
+class AnimalListAdapter(var list: MutableList<Animal>): RecyclerView.Adapter<AnimalListAdapter.ViewHolder>() {
 
     inner class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
         var name: TextView
@@ -59,19 +59,19 @@ class AnimalListAdapter(var list: ArrayList<Animal>): RecyclerView.Adapter<Anima
         val dataPosition = list[position]
 
         println(list[position])
-        holder.name.text = "Name: " + dataPosition.name
-        holder.latinName.text = "Latin name: " + dataPosition.latinName
-        holder.animalType.text = "Anima Type: " + dataPosition.animalType
-        holder.activeTime.text = "Active time: " + dataPosition.activeTime
-        holder.lengthMin.text = "Length min: " + dataPosition.lengthMin
-        holder.lengthMax.text = "Length max: " + dataPosition.lengthMax
-        holder.weightMin.text = "Weight min: " + dataPosition.weightMin
-        holder.weightMax.text = "Weight max: " + dataPosition.weightMax
-        holder.lifespan.text = "Lifespan: " + dataPosition.lifespan
-        holder.habitat.text = "Habitat: " + dataPosition.habitat
-        holder.diet.text = "Diet: " + dataPosition.diet
-        holder.geoRange.text = "Get Range: " + dataPosition.geoRange
-        holder.id.text = "ID: " + dataPosition.id
+        holder.name.text = ("Name: " + dataPosition.name) ?: "***"
+        holder.latinName.text = ("Latin name: " + dataPosition.latinName)
+        holder.animalType.text = "Anima Type: " + dataPosition.animalType ?: "***"
+        holder.activeTime.text = "Active time: " + dataPosition.activeTime ?: "***"
+        holder.lengthMin.text = "Length min: " + dataPosition.lengthMin ?: "***"
+        holder.lengthMax.text = "Length max: " + dataPosition.lengthMax ?: "***"
+        holder.weightMin.text = "Weight min: " + dataPosition.weightMin ?: "***"
+        holder.weightMax.text = "Weight max: " + dataPosition.weightMax ?: "***"
+        holder.lifespan.text = "Lifespan: " + dataPosition.lifespan ?: "***"
+        holder.habitat.text = "Habitat: " + dataPosition.habitat ?: "***"
+        holder.diet.text = "Diet: " + dataPosition.diet ?: "***"
+        holder.geoRange.text = ("Get Range: " + dataPosition.geoRange) ?: "***"
+        holder.id.text = ("ID: " + dataPosition.id) ?: "***"
 
         println(dataPosition.name + ", \n" +
                 dataPosition.latinName + ", \n" +
