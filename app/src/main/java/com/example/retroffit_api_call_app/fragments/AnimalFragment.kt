@@ -34,7 +34,6 @@ class AnimalFragment : Fragment() {
     private var isRunning: Boolean = false
     private lateinit var thread: Thread
 
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -83,16 +82,14 @@ class AnimalFragment : Fragment() {
             .url(URL)
             .build()
 
-        val okHttp = client.newCall(request).execute()
-        if (okHttp.isSuccessful) {
-            val string = okHttp.body?.string()
+        val response = client.newCall(request).execute()
+        if (response.isSuccessful) {
             val userType = object : TypeToken<MutableList<Animal>>() {}.type
-            res = (Gson().fromJson(string, userType))
+            res = (Gson().fromJson(response.body?.string(), userType))
             return res
         }
         return null
     }
-
 
     private fun setupAnimalListAdapter() {
         adapter = AnimalListAdapter(animalList)
