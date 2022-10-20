@@ -62,7 +62,7 @@ class AnimalFragment : Fragment() {
 
             //OkHttp call
             try {
-                okHttpAnimalList = getOkHttpResponse()!!
+                okHttpAnimalList = getOkHttpAnimals()!!
                 animalList.addAll(okHttpAnimalList)
 
                 val handler = Handler(Looper.getMainLooper())
@@ -75,7 +75,7 @@ class AnimalFragment : Fragment() {
         }.start()
     }
 
-    private fun getOkHttpResponse(): MutableList<Animal>? {
+    private fun getOkHttpAnimals(): MutableList<Animal>? {
         val res: MutableList<Animal>
         val client = OkHttpClient()
         val request: Request = Request.Builder()
