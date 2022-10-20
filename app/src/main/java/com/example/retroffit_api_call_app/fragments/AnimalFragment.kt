@@ -14,12 +14,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.retroffit_api_call_app.MainActivity
-import com.example.retroffit_api_call_app.R
 import com.example.retroffit_api_call_app.Services.ApiService
 import com.example.retroffit_api_call_app.adapters.AnimalListAdapter
 import com.example.retroffit_api_call_app.common.Common
-import com.example.retroffit_api_call_app.databinding.ActivityMainBinding
 import com.example.retroffit_api_call_app.databinding.FragmentAnimalBinding
 import com.example.retroffit_api_call_app.models.Animal
 import com.google.gson.Gson
@@ -31,7 +28,6 @@ class AnimalFragment : Fragment() {
     private var animalList = mutableListOf<Animal>()
     private var retrofitAnimalList = mutableListOf<Animal>()
     private var okHttpAnimalList = mutableListOf<Animal>()
-    private lateinit var animalListFragment: AnimalFragment
     private lateinit var binding: FragmentAnimalBinding
     private lateinit var adapter: AnimalListAdapter
     private var apiService: ApiService? = null
