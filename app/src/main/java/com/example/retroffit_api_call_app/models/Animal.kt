@@ -1,40 +1,40 @@
 package com.example.retroffit_api_call_app.models
 
-import com.squareup.moshi.Json
+import com.google.gson.annotations.SerializedName
 
-data class Animal (
+data class Animal(
     val name: String,
 
-    @Json(name = "latin_name")
+    @SerializedName("latin_name")
     val latinName: String,
 
-    @Json(name = "animal_type")
+    @SerializedName("animal_type")
     val animalType: String,
 
-    @Json(name = "active_time")
+    @SerializedName("active_time")
     val activeTime: String,
 
-    @Json(name = "length_min")
+    @SerializedName("length_min")
     val lengthMin: String,
 
-    @Json(name = "length_max")
+    @SerializedName("length_max")
     val lengthMax: String,
 
-    @Json(name = "weight_min")
+    @SerializedName("weight_min")
     val weightMin: String,
 
-    @Json(name = "weight_max")
+    @SerializedName("weight_max")
     val weightMax: String,
 
     val lifespan: String,
     val habitat: String,
     val diet: String,
 
-    @Json(name = "geo_range")
+    @SerializedName("geo_range")
     val geoRange: String,
 
-    @Json(name = "image_link")
+    @SerializedName("image_link")
     val imageLink: String,
 
-    val id: Long
+    val id: String
 )
