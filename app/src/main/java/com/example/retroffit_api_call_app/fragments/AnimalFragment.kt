@@ -1,5 +1,7 @@
 package com.example.retroffit_api_call_app.fragments
 
+import android.content.Context
+import android.content.DialogInterface
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
@@ -7,8 +9,10 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.retroffit_api_call_app.R
 import com.example.retroffit_api_call_app.adapters.AnimalListAdapter
 import com.example.retroffit_api_call_app.common.Common
 import com.example.retroffit_api_call_app.databinding.FragmentAnimalBinding
@@ -35,19 +39,16 @@ class AnimalFragment : Fragment() {
         return binding.root
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupRunnableApiCallTask()
-    }
 
-    @OptIn(DelicateCoroutinesApi::class)
-    private fun setupRunnableApiCallTask() {
-        GlobalScope.launch {
-            task1()
-        }
-        GlobalScope.launch {
-            task2()
-        }
+//        GlobalScope.launch {
+//            task1()
+//        }
+//        GlobalScope.launch {
+//            task2()
+//        }
         GlobalScope.launch {
             task3()
         }
@@ -160,8 +161,57 @@ class AnimalFragment : Fragment() {
         Log.e("loadData isActive: ", loadData.isActive.toString())
     }
 
+    private fun displayAlertDialog() {
+        AlertDialog.Builder(requireActivity())
+            .setTitle("Error!")
+            .setMessage("Load data exception!")
+            .setCancelable(false)
+            .setPositiveButton("OK") { dialog, id -> println("finish") }
+            .create()
+            .show()
+    }
+
     //subtask3
     private suspend fun task3() {
-        val supervisorJob = SupervisorJob()
+        // comment necessary line to check work with job and superJob
+        superVisionJob()
+        job()
+    }
+
+    private suspend fun superVisionJob() {
+        supervisorScope {
+            val loadData = async {
+                delay(1000)
+                throw Exception()
+            }
+            try {
+                loadData.await()
+            } catch (e: java.lang.Exception) {
+                withContext(Dispatchers.Main) {
+                    displayAlertDialog()
+                }
+            }
+        }
+    }
+
+    private suspend fun job() {
+        val job = Job()
+        val handler1 = CoroutineExceptionHandler { _, exception ->
+            displayAlertDialog()
+            println("CoroutineExceptionHandler got $exception")
+        }
+        val scope1 = CoroutineScope(Dispatchers.IO + job)
+        val loadData1 = scope1.async {
+            delay(1000)
+            throw Exception()
+        }
+        try {
+            loadData1.await()
+        } catch (e: java.lang.Exception) {
+            withContext(Dispatchers.Main) {
+                displayAlertDialog()
+            }
+            Log.d("Exception: ", e.toString())
+        }
     }
 }
