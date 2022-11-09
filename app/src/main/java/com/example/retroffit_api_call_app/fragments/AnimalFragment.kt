@@ -42,12 +42,12 @@ class AnimalFragment : Fragment() {
 
     @OptIn(DelicateCoroutinesApi::class)
     private fun setupRunnableApiCallTask() {
-//        GlobalScope.launch {
-//            task1()
-//        }
-//        GlobalScope.launch {
-//            task2()
-//        }
+        GlobalScope.launch {
+            task1()
+        }
+        GlobalScope.launch {
+            task2()
+        }
         GlobalScope.launch {
             task3()
         }
@@ -108,10 +108,11 @@ class AnimalFragment : Fragment() {
 
     //subtask2
     private suspend fun task2() {
-        val job = SupervisorJob()
+        val job = Job()
         val scope = CoroutineScope(Dispatchers.IO + job)
 
         val loadData = scope.launch {
+
             //Retrofit call
             val retrofitCall = async {
                 val retrofitService = Common.retrofitService
@@ -124,6 +125,7 @@ class AnimalFragment : Fragment() {
                 }
                 Log.e("Thread", Thread.currentThread().toString())
             }
+
             try {
                 retrofitCall.await()
             } catch (e: Error) {
@@ -140,6 +142,7 @@ class AnimalFragment : Fragment() {
                     setupAnimalListAdapter()
                 }
             }
+
             try {
                 okkHttpCal.await()
             } catch (e: Error) {
@@ -147,7 +150,7 @@ class AnimalFragment : Fragment() {
             }
         }
 
-        for (i in 0..2) {
+        for (i in 0..3) {
             loadData.start()
             delay(500)
             Log.e("loadData isActive: ", loadData.isActive.toString())
@@ -159,6 +162,6 @@ class AnimalFragment : Fragment() {
 
     //subtask3
     private suspend fun task3() {
-        
+        val supervisorJob = SupervisorJob()
     }
 }
