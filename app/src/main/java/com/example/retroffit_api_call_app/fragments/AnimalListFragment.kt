@@ -20,5 +20,4 @@ class AnimalListFragment: Fragment() {
 
         return inflater.inflate(R.layout.activity_main, container, false)
     }
-
 }
