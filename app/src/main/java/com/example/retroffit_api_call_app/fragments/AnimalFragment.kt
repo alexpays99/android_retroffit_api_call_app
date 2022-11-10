@@ -177,8 +177,8 @@ class AnimalFragment : Fragment() {
     private suspend fun task3() {
         // comment necessary line to check work with job and superJob
 
-        superVisionJob()
-//        job()
+//        superVisionJob()
+        job()
     }
 
     private suspend fun superVisionJob() {
@@ -191,20 +191,20 @@ class AnimalFragment : Fragment() {
         val scope = CoroutineScope(Dispatchers.IO + job)
 
         scope.launch(handler) {
-            val exception = async {
+            val exception = launch {
                 delay(1000)
                 throw Exception()
             }
-            val loadRetrofitData = async {
+            val loadRetrofitData = launch {
                 retrofitApiCall()
             }
             try {
-                exception.await()
+                exception.start()
             } catch (e: Exception) {
                 Log.e("job", "exception Exception")
             }
             try {
-                loadRetrofitData.await()
+                loadRetrofitData.start()
             } catch (e: Exception) {
                 Log.e("job", "loadRetrofitData Exception")
             }
@@ -221,20 +221,20 @@ class AnimalFragment : Fragment() {
         val scope = CoroutineScope(Dispatchers.IO + job)
 
         scope.launch(handler) {
-            val exception = async {
+            val exception = launch {
                 delay(1000)
                 throw Exception()
             }
-            val loadRetrofitData = async {
+            val loadRetrofitData = launch {
                 retrofitApiCall()
             }
             try {
-                exception.await()
+                exception.start()
             } catch (e: Exception) {
                 Log.e("job", "exception Exception")
             }
             try {
-                loadRetrofitData.await()
+                loadRetrofitData.start()
             } catch (e: Exception) {
                 Log.e("job", "loadRetrofitData Exception")
             }
