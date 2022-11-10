@@ -21,6 +21,8 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers.IO
+import okhttp3.Dispatcher
 import okhttp3.OkHttpClient
 import okhttp3.Request
 
@@ -39,19 +41,16 @@ class AnimalFragment : Fragment() {
         return binding.root
     }
 
-    @OptIn(DelicateCoroutinesApi::class)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-//        GlobalScope.launch {
-//            task1()
-//        }
-//        GlobalScope.launch {
+//        task1()
+//        CoroutineScope(Dispatchers.Default).launch {
 //            task2()
 //        }
-        GlobalScope.launch {
-            task3()
-        }
+//        CoroutineScope(Dispatchers.Default).launch {
+//            task3()
+//        }
     }
 
     private fun getOkHttpAnimals(): MutableList<Animal>? {
@@ -79,8 +78,8 @@ class AnimalFragment : Fragment() {
     }
 
     // subtask1
-    private suspend fun task1() {
-        lifecycleScope.launch(Dispatchers.IO) {
+    private fun task1() {
+        CoroutineScope(IO).launch {
             //Retrofit call
             val retrofitService = Common.retrofitService
 
@@ -110,23 +109,14 @@ class AnimalFragment : Fragment() {
     //subtask2
     private suspend fun task2() {
         val job = Job()
-        val scope = CoroutineScope(Dispatchers.IO + job)
+        val scope = CoroutineScope(IO + job)
 
         val loadData = scope.launch {
 
             //Retrofit call
             val retrofitCall = async {
-                val retrofitService = Common.retrofitService
-
-                val response = retrofitService.getAnimals("5").execute()
-                retrofitAnimalList = response.body()!!
-                animalList.addAll(retrofitAnimalList)
-                withContext(Dispatchers.Main) {
-                    setupAnimalListAdapter()
-                }
-                Log.e("Thread", Thread.currentThread().toString())
+                retrofitApiCall()
             }
-
             try {
                 retrofitCall.await()
             } catch (e: Error) {
@@ -135,20 +125,37 @@ class AnimalFragment : Fragment() {
 
             //OkHttp call
             val okkHttpCal = async {
-                okHttpAnimalList = getOkHttpAnimals()!!
-                animalList.addAll(okHttpAnimalList)
-                adapter.list.addAll(animalList)
-                Log.e("Thread", Thread.currentThread().toString())
-                withContext(Dispatchers.Main) {
-                    setupAnimalListAdapter()
-                }
+                okHttpApiCall()
             }
-
             try {
                 okkHttpCal.await()
             } catch (e: Error) {
                 Log.e("OKHTTP RESULT ERROR: ", e.toString())
             }
+            Log.e("loadData isActive: ", isActive.toString())
+
+//            for (i in 0..3) {
+//                //Retrofit call
+//                val retrofitCall = async {
+//                    retrofitApiCall()
+//                }
+//                try {
+//                    retrofitCall.await()
+//                } catch (e: Error) {
+//                    Log.e("RETROFIT RESULT ERROR: ", e.toString())
+//                }
+//
+//                //OkHttp call
+//                val okkHttpCal = async {
+//                    okHttpApiCall()
+//                }
+//                try {
+//                    okkHttpCal.await()
+//                } catch (e: Error) {
+//                    Log.e("OKHTTP RESULT ERROR: ", e.toString())
+//                }
+//                Log.e("loadData isActive: ", isActive.toString())
+//            }
         }
 
         for (i in 0..3) {
@@ -157,8 +164,32 @@ class AnimalFragment : Fragment() {
             Log.e("loadData isActive: ", loadData.isActive.toString())
         }
         delay(900)
-        loadData.cancel("Coroutine canceled")
+        loadData.cancel()
         Log.e("loadData isActive: ", loadData.isActive.toString())
+    }
+
+    private suspend fun retrofitApiCall() {
+        val retrofitService = Common.retrofitService
+
+        val response = retrofitService.getAnimals("5").execute()
+        retrofitAnimalList = response.body()!!
+        animalList.addAll(retrofitAnimalList)
+        withContext(Dispatchers.Main) {
+            setupAnimalListAdapter()
+        }
+        Log.e("Thread", Thread.currentThread().toString())
+        Log.e("request1", "request1")
+    }
+
+    private suspend fun okHttpApiCall() {
+        okHttpAnimalList = getOkHttpAnimals()!!
+        animalList.addAll(okHttpAnimalList)
+        adapter.list.addAll(animalList)
+        Log.e("Thread", Thread.currentThread().toString())
+        Log.e("request2", "request2")
+        withContext(Dispatchers.Main) {
+            setupAnimalListAdapter()
+        }
     }
 
     private fun displayAlertDialog() {
@@ -186,7 +217,7 @@ class AnimalFragment : Fragment() {
             }
             try {
                 loadData.await()
-            } catch (e: java.lang.Exception) {
+            } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     displayAlertDialog()
                 }
@@ -196,11 +227,7 @@ class AnimalFragment : Fragment() {
 
     private suspend fun job() {
         val job = Job()
-        val handler1 = CoroutineExceptionHandler { _, exception ->
-            displayAlertDialog()
-            println("CoroutineExceptionHandler got $exception")
-        }
-        val scope1 = CoroutineScope(Dispatchers.IO + job)
+        val scope1 = CoroutineScope(IO + job)
         val loadData1 = scope1.async {
             delay(1000)
             throw Exception()
