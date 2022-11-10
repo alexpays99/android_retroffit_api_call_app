@@ -1,18 +1,15 @@
 package com.example.retroffit_api_call_app.fragments
 
-import android.content.Context
-import android.content.DialogInterface
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.retroffit_api_call_app.R
 import com.example.retroffit_api_call_app.adapters.AnimalListAdapter
 import com.example.retroffit_api_call_app.common.Common
 import com.example.retroffit_api_call_app.databinding.FragmentAnimalBinding
@@ -21,8 +18,8 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers.Default
 import kotlinx.coroutines.Dispatchers.IO
-import okhttp3.Dispatcher
 import okhttp3.OkHttpClient
 import okhttp3.Request
 
@@ -45,12 +42,12 @@ class AnimalFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
 //        task1()
-        CoroutineScope(Dispatchers.Default).launch {
-            task2()
-        }
 //        CoroutineScope(Dispatchers.Default).launch {
-//            task3()
+//            task2()
 //        }
+        CoroutineScope(Dispatchers.Default).launch {
+            task3()
+        }
     }
 
     private fun getOkHttpAnimals(): MutableList<Animal>? {
@@ -179,18 +176,71 @@ class AnimalFragment : Fragment() {
     //subtask3
     private suspend fun task3() {
         // comment necessary line to check work with job and superJob
+
         superVisionJob()
-        job()
+//        job()
     }
 
+//    private suspend fun superVisionJob() {
+//        supervisorScope {
+//            val loadData = async {
+//                delay(1000)
+//                throw Exception()
+//            }
+//            try {
+//                loadData.await()
+//            } catch (e: Exception) {
+//                withContext(Dispatchers.Main) {
+//                    displayAlertDialog()
+//                }
+//            }
+//        }
+//    }
+//
+//    private suspend fun job() {
+//        val job = Job()
+//        val scope1 = CoroutineScope(IO + job)
+//        val loadData1 = scope1.async {
+//            delay(1000)
+//            throw Exception()
+//        }
+//        try {
+//            loadData1.await()
+//        } catch (e: java.lang.Exception) {
+//            withContext(Dispatchers.Main) {
+//                displayAlertDialog()
+//            }
+//            Log.d("Exception: ", e.toString())
+//        }
+//    }
+
     private suspend fun superVisionJob() {
-        supervisorScope {
-            val loadData = async {
+        val handler = CoroutineExceptionHandler { _, exception ->
+            val handler = Handler(Looper.getMainLooper())
+            handler.post { displayAlertDialog() }
+            println("CoroutineExceptionHandler got $exception with suppressed ${exception.suppressed.contentToString()}")
+        }
+        val job = SupervisorJob()
+        val scope = CoroutineScope(Dispatchers.IO + job)
+
+        scope.launch(handler) {
+            val exception = async {
                 delay(1000)
                 throw Exception()
             }
+            val loadRetrofitData = async {
+                retrofitApiCall()
+            }
+
             try {
-                loadData.await()
+                loadRetrofitData.await()
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    displayAlertDialog()
+                }
+            }
+            try {
+                exception.await()
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     displayAlertDialog()
@@ -200,19 +250,34 @@ class AnimalFragment : Fragment() {
     }
 
     private suspend fun job() {
-        val job = Job()
-        val scope1 = CoroutineScope(IO + job)
-        val loadData1 = scope1.async {
-            delay(1000)
-            throw Exception()
+        val handler = CoroutineExceptionHandler { _, exception ->
+            println("CoroutineExceptionHandler got $exception with suppressed ${exception.suppressed.contentToString()}")
         }
-        try {
-            loadData1.await()
-        } catch (e: java.lang.Exception) {
-            withContext(Dispatchers.Main) {
-                displayAlertDialog()
+        val job = Job()
+        val scope = CoroutineScope(Dispatchers.Default + job)
+
+        scope.launch(handler) {
+            val exception = async {
+                delay(1000)
+                throw Exception()
             }
-            Log.d("Exception: ", e.toString())
+            val loadRetrofitData = async {
+                retrofitApiCall()
+            }
+            try {
+                loadRetrofitData.await()
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    displayAlertDialog()
+                }
+            }
+            try {
+                exception.await()
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    displayAlertDialog()
+                }
+            }
         }
     }
 }
