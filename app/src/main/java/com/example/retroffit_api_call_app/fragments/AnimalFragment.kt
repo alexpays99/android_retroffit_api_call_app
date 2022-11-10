@@ -181,39 +181,6 @@ class AnimalFragment : Fragment() {
 //        job()
     }
 
-//    private suspend fun superVisionJob() {
-//        supervisorScope {
-//            val loadData = async {
-//                delay(1000)
-//                throw Exception()
-//            }
-//            try {
-//                loadData.await()
-//            } catch (e: Exception) {
-//                withContext(Dispatchers.Main) {
-//                    displayAlertDialog()
-//                }
-//            }
-//        }
-//    }
-//
-//    private suspend fun job() {
-//        val job = Job()
-//        val scope1 = CoroutineScope(IO + job)
-//        val loadData1 = scope1.async {
-//            delay(1000)
-//            throw Exception()
-//        }
-//        try {
-//            loadData1.await()
-//        } catch (e: java.lang.Exception) {
-//            withContext(Dispatchers.Main) {
-//                displayAlertDialog()
-//            }
-//            Log.d("Exception: ", e.toString())
-//        }
-//    }
-
     private suspend fun superVisionJob() {
         val handler = CoroutineExceptionHandler { _, exception ->
             val handler = Handler(Looper.getMainLooper())
@@ -231,30 +198,27 @@ class AnimalFragment : Fragment() {
             val loadRetrofitData = async {
                 retrofitApiCall()
             }
-
-            try {
-                loadRetrofitData.await()
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    displayAlertDialog()
-                }
-            }
             try {
                 exception.await()
             } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    displayAlertDialog()
-                }
+                Log.e("job", "exception Exception")
             }
-        }
+            try {
+                loadRetrofitData.await()
+            } catch (e: Exception) {
+                Log.e("job", "loadRetrofitData Exception")
+            }
+        }.join()
     }
 
     private suspend fun job() {
         val handler = CoroutineExceptionHandler { _, exception ->
+            val handler = Handler(Looper.getMainLooper())
+            handler.post { displayAlertDialog() }
             println("CoroutineExceptionHandler got $exception with suppressed ${exception.suppressed.contentToString()}")
         }
         val job = Job()
-        val scope = CoroutineScope(Dispatchers.Default + job)
+        val scope = CoroutineScope(Dispatchers.IO + job)
 
         scope.launch(handler) {
             val exception = async {
@@ -265,19 +229,15 @@ class AnimalFragment : Fragment() {
                 retrofitApiCall()
             }
             try {
-                loadRetrofitData.await()
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    displayAlertDialog()
-                }
-            }
-            try {
                 exception.await()
             } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    displayAlertDialog()
-                }
+                Log.e("job", "exception Exception")
             }
-        }
+            try {
+                loadRetrofitData.await()
+            } catch (e: Exception) {
+                Log.e("job", "loadRetrofitData Exception")
+            }
+        }.join()
     }
 }
