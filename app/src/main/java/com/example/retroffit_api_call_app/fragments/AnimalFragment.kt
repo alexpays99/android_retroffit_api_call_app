@@ -133,29 +133,6 @@ class AnimalFragment : Fragment() {
                 Log.e("OKHTTP RESULT ERROR: ", e.toString())
             }
             Log.e("loadData isActive: ", isActive.toString())
-
-//            for (i in 0..3) {
-//                //Retrofit call
-//                val retrofitCall = async {
-//                    retrofitApiCall()
-//                }
-//                try {
-//                    retrofitCall.await()
-//                } catch (e: Error) {
-//                    Log.e("RETROFIT RESULT ERROR: ", e.toString())
-//                }
-//
-//                //OkHttp call
-//                val okkHttpCal = async {
-//                    okHttpApiCall()
-//                }
-//                try {
-//                    okkHttpCal.await()
-//                } catch (e: Error) {
-//                    Log.e("OKHTTP RESULT ERROR: ", e.toString())
-//                }
-//                Log.e("loadData isActive: ", isActive.toString())
-//            }
         }
 
         for (i in 0..3) {
