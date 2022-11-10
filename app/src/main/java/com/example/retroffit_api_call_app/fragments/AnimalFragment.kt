@@ -45,9 +45,9 @@ class AnimalFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
 //        task1()
-//        CoroutineScope(Dispatchers.Default).launch {
-//            task2()
-//        }
+        CoroutineScope(Dispatchers.Default).launch {
+            task2()
+        }
 //        CoroutineScope(Dispatchers.Default).launch {
 //            task3()
 //        }
@@ -112,35 +112,32 @@ class AnimalFragment : Fragment() {
         val scope = CoroutineScope(IO + job)
 
         val loadData = scope.launch {
+            repeat(3) {
+                //Retrofit call
+                val retrofitCall = async {
+                    retrofitApiCall()
+                }
+                try {
+                    retrofitCall.await()
+                } catch (e: Error) {
+                    Log.e("RETROFIT RESULT ERROR: ", e.toString())
+                }
 
-            //Retrofit call
-            val retrofitCall = async {
-                retrofitApiCall()
+                //OkHttp call
+                val okkHttpCal = async {
+                    okHttpApiCall()
+                }
+                try {
+                    okkHttpCal.await()
+                } catch (e: Error) {
+                    Log.e("OKHTTP RESULT ERROR: ", e.toString())
+                }
+                Log.e("loadData isActive: ", isActive.toString())
             }
-            try {
-                retrofitCall.await()
-            } catch (e: Error) {
-                Log.e("RETROFIT RESULT ERROR: ", e.toString())
-            }
-
-            //OkHttp call
-            val okkHttpCal = async {
-                okHttpApiCall()
-            }
-            try {
-                okkHttpCal.await()
-            } catch (e: Error) {
-                Log.e("OKHTTP RESULT ERROR: ", e.toString())
-            }
-            Log.e("loadData isActive: ", isActive.toString())
-        }
-
-        for (i in 0..3) {
-            loadData.start()
             delay(500)
-            Log.e("loadData isActive: ", loadData.isActive.toString())
         }
-        delay(900)
+        loadData.join()
+        delay(1700)
         loadData.cancel()
         Log.e("loadData isActive: ", loadData.isActive.toString())
     }
